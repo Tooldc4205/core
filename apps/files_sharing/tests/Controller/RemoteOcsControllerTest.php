@@ -125,6 +125,17 @@ class RemoteOcsControllerTest extends TestCase {
 		$this->assertEquals(100, $result->getStatusCode());
 	}
 
+	public function testGetAllShares() {
+		$this->externalManager->expects($this->once())
+			->method('getAcceptedShares')
+			->willReturn([]);
+		$this->externalManager->expects($this->once())
+			->method('getOpenShares')
+			->willReturn([['mountpoint' => '{{TemporaryMountPointName#/filename.ext}}']]);
+		$result = $this->controller->getAllShares();
+		$this->assertEquals(100, $result->getStatusCode());
+	}
+
 	public function getShareDataProvider() {
 		return [
 			[false, 404],

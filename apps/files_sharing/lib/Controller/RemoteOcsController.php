@@ -108,13 +108,47 @@ class RemoteOcsController extends OCSController {
 	 * @NoCSRFRequired
 	 * @NoAdminRequired
 	 *
+	 * @param bool $includingPending
 	 * @return Result
 	 */
-	public function getShares() {
-		$shares = $this->externalManager->getAcceptedShares();
-		$shares = \array_map([$this, 'extendShareInfo'], $shares);
+	public function getShares($includingPending = false) {
+		$shares = \array_map(
+			[$this, 'extendShareInfo'],
+			$this->externalManager->getAcceptedShares()
+		);
+
+		if ($includingPending === true) {
+			/**
+			 * pending shares have mountpoint looking like
+			 * {{TemporaryMountPointName#/filename.ext}}
+			 * so we need to cut it off
+			 */
+			$openShares = \array_map(
+				function ($share) {
+					$share['mountpoint'] = \substr(
+						$share['mountpoint'],
+						\strlen('{{TemporaryMountPointName#')
+					);
+
+					$share['mountpoint'] = \rtrim($share['mountpoint'], '}');
+					return $share;
+				},
+				$this->externalManager->getOpenShares()
+			);
+			$shares = \array_merge($shares, $openShares);
+		}
 
 		return new Result($shares);
+	}
+
+	/**
+	 * @NoCSRFRequired
+	 * @NoAdminRequired
+	 *
+	 * @return Result
+	 */
+	public function getAllShares() {
+		return $this->getShares(true);
 	}
 
 	/**
