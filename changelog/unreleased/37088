@@ -1,0 +1,7 @@
+Bugfix: fix OCS Share API response for requests contain "include_tags" parameter
+
+Sending "include_tags" request parameter for OCS Share API was led to duplicated share entries in API response.
+This problem has been fixed.
+
+https://github.com/owncloud/core/issues/37084
+https://github.com/owncloud/core/pull/37088
